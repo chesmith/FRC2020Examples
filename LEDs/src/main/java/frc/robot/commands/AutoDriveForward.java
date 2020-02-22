@@ -9,17 +9,17 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.LED;
-import frc.robot.subsystems.LED.LED_MODE;
+import frc.robot.subsystems.LEDStrip;
+import frc.robot.subsystems.LEDStrip.LED_MODE;
 
 public class AutoDriveForward extends CommandBase {
   private DriveTrain _driveTrain;
-  private LED _led;
+  private LEDStrip _led;
 
   /**
    * Creates a new AutoDriveForward.
    */
-  public AutoDriveForward(DriveTrain driveTrain, LED led) {
+  public AutoDriveForward(DriveTrain driveTrain, LEDStrip led) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(driveTrain);
     _driveTrain = driveTrain;

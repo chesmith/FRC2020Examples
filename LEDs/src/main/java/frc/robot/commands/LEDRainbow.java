@@ -8,15 +8,15 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.subsystems.LED;
-import frc.robot.subsystems.LED.LED_MODE;
+import frc.robot.subsystems.LEDStrip;
+import frc.robot.subsystems.LEDStrip.LED_MODE;
 
 public class LEDRainbow extends InstantCommand {
-  private LED _led;
+  private LEDStrip _led;
   /**
    * Creates a new LEDRainbow.
    */
-  public LEDRainbow(LED led) {
+  public LEDRainbow(LEDStrip led) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(led);
     _led = led;

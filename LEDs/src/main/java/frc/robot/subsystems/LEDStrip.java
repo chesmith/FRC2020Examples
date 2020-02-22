@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LED extends SubsystemBase {
+public class LEDStrip extends SubsystemBase {
   public static enum LED_MODE {
     Off, Rainbow, ReverseRainbow, Plaid
   }
@@ -21,21 +21,26 @@ public class LED extends SubsystemBase {
   private enum LED_COLOR {
     Green, Blue, Yellow
   }
-  
+
   private AddressableLED m_led;
   private AddressableLEDBuffer m_ledBuffer;
   private int m_rainbowFirstPixelHue;
-  private final int _numLEDs = 102;
+  private final int _numLEDs;
   private LED_COLOR _currentColor = LED_COLOR.Blue;
   private double _lastTime = Timer.getFPGATimestamp();
 
   private LED_MODE _mode = LED_MODE.Off;
+  private int _index;
+
+  private double _interval = 0.25;
 
   /**
    * Creates a new LEDs.
    */
-  public LED() {
-    m_led = new AddressableLED(9);
+  public LEDStrip(int numberOfLeds, int port) {
+    m_led = new AddressableLED(port);
+    _numLEDs = numberOfLeds;
+
     // Length is expensive to set, so only set it once, then just update data
     m_ledBuffer = new AddressableLEDBuffer(_numLEDs);
     m_led.setLength(m_ledBuffer.getLength());
@@ -51,6 +56,13 @@ public class LED extends SubsystemBase {
 
   public void setMode(LED_MODE mode) {
     _mode = mode;
+  }
+
+  private void increment() {
+    _index++;
+    if (_index >= m_ledBuffer.getLength()) {
+      _index = 0;
+    }
   }
 
   private void off() {
@@ -92,10 +104,10 @@ public class LED extends SubsystemBase {
     m_rainbowFirstPixelHue %= 180;
   }
 
-  private void plaid() {
+  private void plaid_orig() {
     SmartDashboard.putString("LED Mode", "plaid");
     double currentTime = Timer.getFPGATimestamp();
-    if ((currentTime - _lastTime) > 0.25) {
+    if ((currentTime - _lastTime) > _interval) {
       _lastTime = currentTime;
       // put your main code here, to run repeatedly:
       for (int i = 0; i < m_ledBuffer.getLength(); i++) {
@@ -120,14 +132,49 @@ public class LED extends SubsystemBase {
     }
   }
 
+  private void plaid() {
+    SmartDashboard.putString("LED Mode", "plaid2");
+    double currentTime = Timer.getFPGATimestamp();
+    if ((currentTime - _lastTime) > _interval) {
+      _lastTime = currentTime;
+      for (int i = 0; i < m_ledBuffer.getLength(); i++) {
+        if ((i + _index) % 3 == 0) {
+          m_ledBuffer.setRGB(i, 0, 102, 255);
+        } else if ((i + _index) % 3 == 1) {
+          m_ledBuffer.setRGB(i, 255, 255, 0);
+        } else {
+          m_ledBuffer.setRGB(i, 46, 184, 46);
+        }
+      }
+
+      increment();
+    }
+  }
+
+  public void increaseInterval() {
+    _interval += 0.05;
+  }
+
+  public void decreaseInterval() {
+    _interval -= 0.05;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    switch(_mode) {
-      case Rainbow: rainbow(); break;
-      case ReverseRainbow: reverseRainbow(); break;
-      case Plaid: plaid(); break;
-      default: off(); break;
+    switch (_mode) {
+    case Rainbow:
+      rainbow();
+      break;
+    case ReverseRainbow:
+      reverseRainbow();
+      break;
+    case Plaid:
+      plaid();
+      break;
+    default:
+      off();
+      break;
     }
     m_led.setData(m_ledBuffer);
   }
