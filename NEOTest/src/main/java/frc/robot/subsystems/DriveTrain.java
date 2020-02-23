@@ -19,18 +19,22 @@ public class DriveTrain extends SubsystemBase {
    * Creates a new DriveTrain.
    */
 
-  CANSparkMax _spark = new CANSparkMax(1, MotorType.kBrushless);
+  CANSparkMax _motorController = new CANSparkMax(1, MotorType.kBrushless);
 
   public DriveTrain() {
 
   }
 
   public void teleopDrive(Joystick joystick) {
-    _spark.set(joystick.getRawAxis(JoystickConstants.LEFT_STICK_Y));
+    double speed = joystick.getRawAxis(JoystickConstants.LEFT_STICK_Y);
+    if (Math.abs(speed) > 0.1)
+      _motorController.set(speed);
+    else
+      _motorController.set(0);
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+      // This method will be called once per scheduler run
   }
 }
